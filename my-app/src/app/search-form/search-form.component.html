@@ -1,0 +1,716 @@
+<div class="container bg-dark mt-3">
+    <div class="row justify-content-center"> 
+        <div class="col-12 col-sm-8 col-md-8 col-lg-6 text-white"> 
+            <form #searchForm="ngForm" (ngSubmit)="onSubmit(searchForm)" class="mx-auto p-4 rounded bg-dark" style="max-width: 100%;">
+                <h2 class="mb-4">Product Search</h2>
+        
+                <div class="mb-3 row">
+                    <label for="keyword" class="col-sm-3 col-form-label">Keyword<span class="red-asterisk"></span></label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="keyword" name="keyword" [(ngModel)]="keyword" required placeholder="Enter Product Name (e.g. iPhone 8)">
+                        <div *ngIf="formSubmitted && !keyword.trim()" class="error-message">Keyword is required.</div>
+                    </div>
+                </div>
+        
+                <div class="mb-3 row">
+                    <label for="category" class="col-sm-3 col-form-label">Category</label>
+                    <div class="col-sm-9">
+                        <select class="form-select p-2 " id="category" aria-label="Default" name="category" [(ngModel)]="selectedCategory">
+                            <option value="all" selected="true" style="color: black;">All Categories</option>
+                            <option value="art">Art</option>
+                            <option value="baby">Baby</option>
+                            <option value="books">Books</option>
+                            <option value="clothing">Clothing, Shoes & Accessories</option>
+                            <option value="computer">Computer/Tablets & Networking</option>
+                            <option value="health">Health & Beauty</option>
+                            <option value="music">Music</option>
+                            <option value="video">Video Games & Console</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <fieldset class="mb-3 row">
+                    <legend class="col-form-label col-sm-3 pt-0">Condition</legend>
+                    <div class="col-sm-9 d-flex flex-wrap">
+                        <div class="col-3 col-sm-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="condition" value="New" id="new" [(ngModel)]="condition.New">
+                                <label class="form-check-label" for="new">New</label>
+                            </div>
+                        </div>
+                        <div class="col-3 col-sm-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="condition" value="Used" id="used" [(ngModel)]="condition.Used">
+                                <label class="form-check-label" for="used">Used</label>
+                            </div>
+                        </div>
+                        <div class="col-3 col-sm-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="condition" value="Unspecified" id="unspecified" [(ngModel)]="condition.Unspecified">
+                                <label class="form-check-label" for="unspecified">Unspecified</label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+        
+                <fieldset class="mb-3 row">
+                    <legend class="col-form-label col-sm-3 pt-0">Shipping Options</legend>
+                    <div class="col-sm-8 d-flex flex-wrap">
+                        <div class="col-5 col-sm-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="shipping" value="localPickup" id="localPickup" [(ngModel)]="shipping_options.localPickup">
+                                <label class="form-check-label" for="localPickup">Local Pickup</label>
+                            </div>
+                        </div>
+                        <div class="col-4 col-sm-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="shipping" value="freeShipping" id="freeShipping" [(ngModel)]="shipping_options.freeShipping">
+                                <label class="form-check-label" for="localPickup">Free Shipping</label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+        
+                <div class="mb-3 row">
+                    <label for="distance" class="col-sm-3 col-form-label">Distance (Miles)</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" id="distance" name="distance" [(ngModel)]="distance"  >
+                    </div>
+                </div>
+        
+                <fieldset class="mb-3 row">
+                    <legend class="col-form-label col-sm-3 pt-0">From<span class="red-asterisk"></span></legend>
+                    <div class="col-sm-9">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="fromLocation" value="currentLocation" id="currentLocation" [(ngModel)]="fromSelection" required>
+                            <label class="form-check-label" for="currentLocation">'Current Location'</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="fromLocation" value="other" id="other" [(ngModel)]="fromSelection">
+                            <label class="form-check-label" for="other">Other: Please specify zip</label>
+                        </div>
+                        <input type="text" [(ngModel)]="zipCode" name="zipCode" class="form-control mt-2" placeholder="Please enter a zip code" maxlength="5" id="typeKeyword" matInput [matAutocomplete]="auto" (input)="onInputChange()" [disabled]="fromSelection === 'currentLocation'">
+                        <div *ngIf="fromSelection === 'other' && zipCode.length !== 5" class="error-message">Zip code must be 5 digits.</div>       
+                        <mat-autocomplete #auto="matAutocomplete">
+                            <mat-option *ngIf="loading;">
+                            </mat-option>
+                            <div *ngIf = "!loading">
+                            <mat-option *ngFor="let option of filteredOptions" [value]="option">
+                              {{option}}
+                            </mat-option>
+                          </div>
+                          </mat-autocomplete>
+                    </div>
+                </fieldset>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-light me-2" [disabled]="isSearchButtonDisabled">
+                        <i class="fa fa-search text-dark"></i> Search
+                    </button>
+                    <button type="button" class="btn btn-light" (click)="onClear(searchForm)">
+                        <i class="fa fa-bars tilted-bars text-dark"></i> Clear
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container">
+    <div class="row justify-content-center mt-3">
+        <ul class="nav nav-pills text-center justify-content-center">
+            <li class="nav-item">
+                <a [class.custom-active]="currentTab === 'results'" class="nav-link" aria-current="page" (click)="toggleTab('results')">Results</a>
+            </li>
+            <li class="nav-item">
+                <a [class.custom-active]="currentTab === 'wishlist'" class="nav-link" (click)="toggleTab('wishlist')">WishList</a>
+            </li>
+        </ul> 
+    </div>
+    <div class="row justify-content-center">
+        <div *ngIf="load" class="progress mt-3">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div *ngIf="currentTab === 'results'">
+            <div *ngIf="flag_result">
+                <div *ngIf = "isebaydataRequeted">
+                <div *ngIf="isebayDataPresent; else noData">
+                    <div class="row justify-content-center mt-3">
+                        <div class="col-lg-12 col-md-10 col-sm-12">
+                            <div class="text-end mb-3">
+                                <button class="btn btn-light" [disabled]="!detailsEnabled" (click)="navigateToProductDetails()">Details &gt;</button>
+                            </div>
+                            <div class="table-responsive">
+                            <table class="bg-dark table-striped custom-table">
+                                <thead>
+                                    <tr class="text-white ">
+                                        <th class="col-0 pe-5 ps-2"><b>#</b></th>
+                                        <th class="col-2 p-2"><b>Image</b></th>
+                                        <th class="col-4 ps-3"><b>Title</b></th>
+                                        <th class="col-1"><b>Price</b></th>
+                                        <th class="col-2 ps-3"><b>Shipping</b></th>
+                                        <th class="col-1 ps-3"><b>Zip</b></th>
+                                        <th class="col-2 ps-5"><b>Wish List</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let data of displayedData, let i = index" class=" table-hover" >
+
+                                        <td class="col-0 text-white align-top pe-5 ps-2 pt-2" [class.highlight]="id === data.itemId[0]"><b>{{(currentPage-1) * itemsPerPage + i + 1}}</b></td>
+                                        
+                                        <td class="align-top p-2 col-2" [class.highlight]="id === data.itemId[0]">
+                                            <a href="{{data.galleryURL[0]}}" target="_blank">
+                                              <img src="{{data.galleryURL[0]}}" style="width:100px;height:100px">
+                                            </a>
+                                          </td>
+                                          
+                                        <td class="col-5 text-white title-cell align-top ps-3 pt-2" (click)="onTitleClick(data)" [class.highlight]="id === data.itemId[0]">
+                                            <span class="text-info" matTooltip="{{data.title}}">{{getTitleDisplay(data.title[0])}}</span>
+                                        </td>            
+                                        <td class="col-1 text-white align-top pt-2" [class.highlight]="id === data.itemId[0]">${{data.sellingStatus[0].currentPrice[0].__value__}}</td>
+                                        <td class="col-1 text-white shipping-cell align-top pt-2 ps-3" [class.highlight]="id === data.itemId[0]">
+                                            <ng-container *ngIf="data.shippingInfo && data.shippingInfo[0].shippingServiceCost && data.shippingInfo[0].shippingServiceCost[0].__value__; else naShipping">
+                                                <ng-container *ngIf="data.shippingInfo[0].shippingServiceCost[0].__value__ === '0.0'; else nonFreeShipping">
+                                                    <label class="form-check-label" for="freeShipping">Free Shipping</label>
+                                                </ng-container>
+                                                <ng-template #nonFreeShipping>
+                                                    ${{data.shippingInfo[0].shippingServiceCost[0].__value__}}
+                                                </ng-template>
+                                            </ng-container>
+                                            <ng-template #naShipping>
+                                                N/A
+                                            </ng-template>
+                                        </td>
+                                        <td class="col-1 text-white align-top pt-2" [class.highlight]="id === data.itemId[0]">{{data.postalCode}}</td>
+                                        <td class="col-2 text-white align-top pt-2 ps-5" [class.highlight]="id === data.itemId[0]">
+                                            <button *ngIf="!isInWishlist(data.itemId[0])" (click)="addToWishlist(data)" class="btn btn-light">
+                                               
+                                                <span class="material-symbols-outlined">
+                                                    add_shopping_cart
+                                                </span>
+                                            </button>
+                                            <button *ngIf="isInWishlist(data.itemId[0])" (click)="removeFromWishlist(data.itemId[0])" class="btn btn-white">
+                                                <span class="material-symbols-outlined" style="color: #ffc107;" >
+                                                    remove_shopping_cart
+                                                </span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                            <div class="pagination-controls mt-3 mb-3 text-center">
+                                
+                                <button class="me-2" (click)="previousPage()" [disabled]="currentPage === 1">&laquo; Previous</button>
+                                
+                                <span class="page-number me-2" 
+                                    *ngFor="let page of [].constructor(totalPages); let i = index" 
+                                    [class.current-page]="i + 1 === currentPage" 
+                                    (click)="setPage(i + 1)">
+                                    {{ i + 1 }}
+                                </span>
+                                
+                                <button class="me-2" (click)="nextPage()" [disabled]="currentPage === totalPages">Next &raquo;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <ng-template #noData>
+                    <div class="bg-light-yellow text-color col-12 col-md-12 col-lg-12 col-xl-12 mt-4">
+                      <div class="text-start m-4">
+                        <h3><b>No Records</b></h3>
+                      </div>
+                    </div>  
+                  </ng-template>
+                  
+            </div>  
+        </div>
+        <div *ngIf="currentTab === 'wishlist'">
+
+            <div *ngIf="flag_wishlist">
+            <div *ngIf="wishList.length === 0; else wishlistItems">
+                    <div class="bg-light-yellow text-color col-12 col-md-12 col-lg-12 col-xl-12 mt-4">
+                      <div class="text-start m-4">
+                        <h3><b>No Records</b></h3>
+                      </div>
+                    </div>  
+            </div>
+            <ng-template #wishlistItems>
+            <div class="row justify-content-center mt-3">
+                <div class="col-lg-11 col-md-10 col-sm-12">
+                    <div class="text-end mb-3">
+                        <button class="btn btn-light" [disabled]="!detailsEnabled" (click)="navigateToProductDetails()">Details &gt;</button>
+                    </div>
+                    <div class="table-responsive">
+                    <table class="bg-dark table-striped custom-table">
+                        <thead>
+                            <tr class="text-white ">
+                                <th class="col-0 pe-5 ps-2"><b>#</b></th>
+                                <th class="col-2 p-2"><b>Image</b></th>
+                                <th class="col-4 ps-3"><b>Title</b></th>
+                                <th class="col-2"><b>Price</b></th>
+                                <th class="col-2 ps-3"><b>Shipping</b></th>
+                                <th class="col-2 ps-5"><b>Wish List</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of mongoItems; let i = index">
+                                <td class="text-white align-top pe-5 ps-2 pt-2" [class.highlight]="id === item.itemId"><b>{{ i + 1 }}</b></td>
+                                <td class="align-top p-2" [class.highlight]="id === item.itemId">
+                                    <a href="{{item.itemImage}}" target="_blank">
+                                      <img src="{{item.itemImage}}" style="width:100px;height:100px">
+                                    </a>
+                                  </td>
+                                <td class="text-white title-cell align-top ps-3 pt-2" (click)="onTitleClick(item)" [class.highlight]="id === item.itemId">
+                                    <span class="text-info" matTooltip="{{item.itemTitle}}">{{ getTitleDisplay(item.itemTitle) }}</span>
+                                </td> 
+                                <td class="text-white align-top pt-2" [class.highlight]="id === item.itemId">${{ item.itemPrice }}</td>
+                                <td class="text-white shipping-cell align-top pt-2 ps-3" [class.highlight]="id === item.itemId">
+                                    <ng-container *ngIf="item.itemShipping && item.itemShipping && item.itemShipping; else naShipping">
+                                        <ng-container *ngIf="item.itemShipping === '0.0'; else nonFreeShipping">
+                                            <label class="form-check-label" for="freeShipping">Free Shipping</label>
+                                        </ng-container>
+                                        <ng-template #nonFreeShipping>
+                                            ${{item.itemShipping}}
+                                        </ng-template>
+                                    </ng-container>
+                                    <ng-template #naShipping>
+                                        N/A
+                                    </ng-template>
+                                </td>
+                                <td class="text-white align-top pt-2 ps-5" [class.highlight]="id === item.itemId">
+                                    <button *ngIf="!isInWishlist(item.itemId)" (click)="addToWishlist(item)" class="btn btn-light">
+                                        <span class="material-symbols-outlined">
+                                            add_shopping_cart
+                                        </span>
+                                    </button>
+                                    <button *ngIf="isInWishlist(item.itemId)" (click)="removeFromWishlist(item.itemId)" class="btn btn-white">
+                                        <span class="material-symbols-outlined" style="color: #ffc107;" >
+                                            remove_shopping_cart
+                                        </span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="text-white align-top p-2">Total Shipping</td>
+                                <td class="text-white align-top p-2 ps-5">${{ totalCost | number:'1.2-2' }}</td>
+
+                            </tr>
+                        </tbody>
+                        
+                    </table> 
+                </div>   
+                </div>
+            </div>
+        </ng-template>
+        </div>
+        </div>
+        <div *ngIf="flag_selected_item">
+        <div *ngIf="selectedItem">
+            <div class="row justify-content-center mt-3 text-center">
+                {{selectedItem.Item.Title}}
+            </div>
+            <div class="row">
+                <div class="col-6 text-start mb-1">
+                <button class="btn btn-light" [disabled]="!detailsEnabled" (click)="backToList()">&lt; List</button>
+                </div>
+                <div class="col-6 text-end mb-3 d-flex align-items-center justify-content-end">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{selectedItem.Item.ViewItemURLForNaturalSearch}}&display=popup" target="_blank" class="facebook"><img src="assets/facebook.png" alt="Facebook" style="height: 38px;"></a>
+                    
+                    <button *ngIf="!wishList.includes(loadSelectedWish.itemId[0])" (click)="addToWishlist(loadSelectedWish)" class="btn btn-light ms-2">
+                        <span class="material-symbols-outlined">
+                            add_shopping_cart
+                        </span>
+                    </button>
+                    <button *ngIf="wishList.includes(loadSelectedWish.itemId[0]) || forceTrue" (click)="removeFromWishlist(loadSelectedWish.itemId[0])" class="btn btn-white ms-2">
+                        <span class="material-symbols-outlined" style="color: #ffc107;" >
+                            remove_shopping_cart
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="row justify-content-end mt-3">
+                <ul class="nav nav-pills text-end justify-content-end mb-0">
+                    <li class="nav-item">
+                        <a [class.active]="activeTab === 'product'" class="nav-link" aria-current="page" (click)="changeTab('product')">Product</a>
+                    </li>
+                    <li class="nav-item">
+                        <a [class.active]="activeTab === 'photos'" class="nav-link" (click)="changeTab('photos')">Photos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a [class.active]="activeTab === 'shipping'" class="nav-link" aria-current="page" (click)="changeTab('shipping')">Shipping</a>
+                    </li>
+                    <li class="nav-item">
+                        <a [class.active]="activeTab === 'seller'" class="nav-link" (click)="changeTab('seller')">Seller</a>
+                    </li>
+                    <li class="nav-item">
+                        <a [class.active]="activeTab === 'similar'" class="nav-link" (click)="changeTab('similar')">Similar Products</a>
+                    </li>
+                </ul> 
+            </div>
+            <hr class="mt-0 mb-0">
+            <div class="tab-content">
+                <div *ngIf="activeTab === 'product'">
+                        <table class="mt-2 bg-dark table-striped w-100">
+                            <tbody class="text-white">
+                                <tr>
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1"><b>Product Images</b></div>
+                                        
+                                            <div class="col-12 col-sm-8 ps-3 p-1">
+                                                <span class="text-info" data-bs-toggle="modal" data-bs-target="#productImagesModal">View Product Images</span>
+                                        <div class="modal fade" id="productImagesModal" tabindex="-1" aria-labelledby="productImagesModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                              <div class="modal-content">
+                                                <div class="modal-header">
+                                                  <h5 class="modal-title" id="productImagesModalLabel">Product Images</h5>
+                                                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                  </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                 <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                                                        <div class="carousel-inner">
+                                                        <div class="carousel-item active">
+                                                            <div class="d-flex justify-content-center">
+                                                            <img src="{{firstimage}}" alt="First slide" class="img-fluid carousel-image">
+                                                            </div>
+                                                        </div>
+                                                        <div class="carousel-item" *ngFor="let image of restimages">
+                                                            <div class="d-flex justify-content-center">
+                                                            <img src="{{image}}" alt="Slide" class="img-fluid carousel-image">
+                                                            </div>
+                                                        </div>
+                                                        </div>
+                                                        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-bs-slide="prev">
+                                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                        </a>
+                                                        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-bs-slide="next">
+                                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                            </div>
+                                        
+                                    </div>
+                                </tr>
+                                <tr>
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1"><b>Price</b></div>
+                                        
+                                            <div class="col-12 col-sm-8 ps-3 p-1">{{ selectedItem.Item.CurrentPrice.Value | currency:'USD':'symbol' }}</div>
+                                        
+                                    </div>
+                                </tr>
+                                <tr>
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1"><b>Location</b></div>
+                                        
+                                            <div class="col-12 col-sm-8 ps-3 p-1">{{ selectedItem.Item.Location }}</div>
+                                        
+                                    </div>
+                                </tr>
+                                <tr>
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1"><b>Return Policy (US)</b></div>
+                                        
+                                            <div class="col-12 col-sm-8 ps-3 p-1">{{ selectedItem.Item.ReturnPolicy.ReturnsAccepted }} within {{ selectedItem.Item.ReturnPolicy.ReturnsWithin }}</div>
+                                        
+                                    </div>
+                                </tr>
+                                <tr  *ngFor="let spec of selectedItem.Item.ItemSpecifics.NameValueList">
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1"><b>{{ spec.Name }}</b></div>
+                                        
+                                            <div class="col-12 col-sm-8 ps-3 p-1">{{ spec.Value[0] }}</div>
+                                        
+                                    </div>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div *ngIf="activeTab === 'photos'" class="photo-grid mt-2">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                <div class="row">
+                                    <div class="col-12 mb-1">
+                                        <a [href]="photos[0].link" target="_blank">
+                                            <img [src]="photos[0].link" class="img-fluid custom-img-small border border-5 border-dark"/>
+                                        </a>
+                                    </div>
+                                    <div class="col-12">
+                                        <a [href]="photos[1].link" target="_blank">
+                                            <img [src]="photos[1].link" class="img-fluid custom-img-medium border border-5 border-dark"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                <div class="row">
+                                    <div *ngFor="let photo of photos.slice(2, 5)" class="col-12 mb-1">
+                                        <a [href]="photo.link" target="_blank">
+                                            <img [src]="photo.link" class="img-fluid custom-img-medium border border-5 border-dark"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                <div class="row">
+                                    <div class="col-12 mb-1">
+                                        <a [href]="photos[5].link" target="_blank">
+                                            <img [src]="photos[5].link" class="img-fluid custom-img-small border border-5 border-dark"/>
+                                        </a>
+                                    </div>
+                                    <div class="col-12 mb-1">
+                                        <a [href]="photos[6].link" target="_blank">
+                                            <img [src]="photos[6].link" class="img-fluid custom-img-medium border border-5 border-dark"/>
+                                        </a>
+                                    </div>
+                                    <div class="col-12">
+                                        <a [href]="photos[7].link" target="_blank">
+                                            <img [src]="photos[7].link" class="img-fluid custom-img-large border border-5 border-dark"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div *ngIf="activeTab === 'shipping'">
+                        <table class="mt-2 bg-dark table-striped w-100">
+                            <tbody class="text-white">
+                                <tr>
+                                <div class="row mt-2 mb-2">
+                                        <div class="col-12 col-sm-4 ps-3 p-1"><b>Shipping Cost</b></div>
+                                   
+                                        <div class="col-12 col-sm-8 ps-3 p-1">
+                                            <ng-container *ngIf="shippingCost === '0.0'; else shippingcost">
+                                                Free Shipping
+                                            </ng-container>
+                                            <ng-template #shippingcost>
+                                                {{ shippingCost | currency:'USD':'symbol' }}
+                                            </ng-template>
+                                        </div>
+                                </div>
+                                </tr>
+                                <tr>
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1"><b>Shipping Locations</b></div>
+                                        
+                                            <div class="col-12 col-sm-8 ps-3 p-1">{{ shippingLocation }}</div>
+                                        
+                                    </div>
+                                </tr>
+                                <tr>
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1"><b>Handling time</b></div>
+                                        
+                                            <div class="col-12 col-sm-8 ps-3 p-1">{{ HandlingTime }} days</div>
+                                        
+                                    </div>
+                                </tr>
+                                <tr>
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1"><b>Expedited Shipping</b></div>
+                                        
+                                        <div class="col-12 col-sm-8 ps-3 p-1">
+                                            <td >
+                                            <span *ngIf="ExpiditedShipping" class="material-symbols-outlined text-success">
+                                            done
+                                            </span>
+                                            <span *ngIf="!ExpiditedShipping" class="material-symbols-outlined text-danger">
+                                            close
+                                            </span>
+                                        </div>
+                                    </div>
+                                </tr>
+                                  <tr>
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1"><b>One Day Shipping</b></div>
+                                        
+                                            <div class="col-12 col-sm-8 ps-3 p-1">
+                                                <i *ngIf="OneDayShippingAvailable" class="material-icons text-success">check</i>
+                                                <i *ngIf="!OneDayShippingAvailable" class="material-icons text-danger">clear</i>
+                                            </div>
+                                    </div>
+                                  </tr>
+                                  <tr>
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1"><b>Return Accepted</b></div>
+                                        
+                                            <div class="col-12 col-sm-8 ps-3 p-1">
+                                                <span *ngIf="ReturnsAccepted" class="material-symbols-outlined text-success">
+                                                  done
+                                                </span>
+                                                <span *ngIf="!ReturnsAccepted" class="material-symbols-outlined text-danger">
+                                                  close
+                                                </span>
+                                            </div>
+                                    </div>
+                                  </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div *ngIf="activeTab === 'seller'">
+                        <table class="mt-2 bg-dark table-striped w-100">
+                            <tbody class="text-white">
+                                <tr *ngIf="sellerName">
+                                    <div class="row mt-2 mb-2 text-center">
+                                            <div class="col-12 col-sm-12 ps-3 p-4">{{ sellerName | uppercase }}</div>
+                                    </div>
+                                </tr>
+                                <tr *ngIf="feedbackScore">
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1">Feedback Score</div>
+                                            <div class="col-12 col-sm-8 ps-3 p-1">{{ feedbackScore}}</div>
+                                    </div>
+                                </tr>
+                                <tr *ngIf="popularity">
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1">Popularity</div>
+                                            <div class="col-12 col-sm-8 ps-3 p-1">
+                                                <div class="position-relative d-inline-block">
+                                                    <round-progress
+                                                      [current]="popularity"
+                                                      [max]="100"
+                                                      [color]="'#07f753'"
+                                                      [background]="'#ffffff'"
+                                                      [radius]="20"
+                                                      [semicircle]="false"
+                                                      [rounded]="true"
+                                                      [stroke]="2">
+                                                    </round-progress>
+                                                    <div class="position-absolute top-50 start-50 translate-middle" style="transform: translate(-50%, -50%); font-size: 10px;">
+                                                      {{ popularity }}%
+                                                    </div>
+                                                  </div>
+                                            </div>
+                                    </div>
+                                </tr>
+                                <tr *ngIf="FeedbackRatingStar">
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1">Feedback Rating Star</div>
+                                            <div class="col-12 col-sm-8 ps-3 p-1">
+                                                <i *ngIf="feedbackScore >= 10000; else starBorder"
+                                                    class="material-icons"
+                                                    [style.color]="getStarColor(FeedbackRatingStar)">
+                                                   stars
+                                                 </i>
+                                                 <ng-template #starBorder>
+                                                   <i class="material-icons"
+                                                      [style.color]="getStarColor(FeedbackRatingStar)">
+                                                     star_border
+                                                   </i>
+                                                 </ng-template>
+                                            </div>
+                                    </div>
+                                </tr>
+                                <tr *ngIf="topRated !== null">
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1">Top Rated</div>
+                                            <div class="col-12 col-sm-8 ps-3 p-1">
+                                                <i *ngIf="topRated" class="material-icons text-success">check</i>
+                                                <i *ngIf="!topRated" class="material-icons text-danger">clear</i>
+                                            </div>
+                                    </div>
+                                </tr>                                  
+                                <tr *ngIf="StoreName">
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1">Store Name</div>
+                                            <div class="col-12 col-sm-8 ps-3 p-1">{{StoreName}}</div>
+                                    </div>
+                                </tr>
+                                <tr *ngIf="ButProductAt">
+                                    <div class="row mt-2 mb-2">
+                                            <div class="col-12 col-sm-4 ps-3 p-1">Buy Product At</div>
+                                            <div class="col-12 col-sm-8 ps-3 p-1">
+                                                <a href="{{ ButProductAt }}" target="_blank" class="text-info text-decoration-none">Store</a>
+                                            </div>
+                                    </div>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div *ngIf="activeTab === 'similar'">
+                        <div class="row mt-2 mb-2">
+                            <div class="col-12 col-sm-2">
+                                <select [(ngModel)]="selectedSortCategory" (change)="sortItems()" class="form-select">
+                                    <option value="default">Default</option>
+                                    <option value="title">Product Name</option>
+                                    <option value="timeLeft">Days Left</option>
+                                    <option value="buyItNowPrice">Price</option>
+                                    <option value="shippingCost">Shipping Cost</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-sm-2">
+                                <select [(ngModel)]="selectedSortOrder" [disabled]="selectedSortCategory === 'default'" (change)="sortItems()" class="form-select">
+                                    <option value="asc">Ascending</option>
+                                    <option value="desc">Descending</option>
+                                </select>
+                            </div>
+                        </div>
+                    
+                        <div *ngIf="similarItems && similarItems.length > 0; else noRecords">
+                            <div *ngFor="let item of similarItems; let index = index" class="card mb-2 bg-dark text-white" 
+                                 [hidden]="!displayAll && index >= 5">
+                              <div class="row no-gutters">
+                                <div class="col-12 col-lg-2 col-sm-2 p-1 ps-4">
+                                  <a href="{{item.imageURL}}" target="_blank">
+                                    <img src="{{item.imageURL}}" class="card-img p-2" style="width: 180px; height: 180px;">
+                                  </a>
+                                </div>
+                                <div class="col-12 col-lg-10 col-sm-10 p-2 pt-1">
+                                  <div class="card-body">
+                                    <h5 class="card-title text-info mb-1">
+                                      <a *ngIf="item.viewItemURL; else notAvailableTitle"
+                                         [href]="item.viewItemURL" 
+                                         target="_blank">{{ item.title | uppercase }}</a>
+                                      <ng-template #notAvailableTitle>
+                                        {{ item.title | uppercase }}
+                                      </ng-template>
+                                    </h5>
+                                    <p class="card-text text-success mb-1"><strong>Price:</strong> {{ item.buyItNowPrice.__value__ | currency:'USD':'symbol' }}</p>
+                                    <p class="card-text text-warning mb-1"><strong>Shipping Cost:</strong> {{ item.shippingCost.__value__ ? (item.shippingCost.__value__ | currency:'USD':'symbol') : 'Free Shipping' }}</p>
+                                    <p class="card-text text-white mb-1"><strong>Days Left:</strong> {{ item.timeLeft.split('P')[1].split('D')[0] }}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="text-center mt-3 mb-2">
+                                <button *ngIf="similarItems.length > 5" (click)="toggleDisplayAll()" class="btn btn-dark">{{ displayAll ? 'Show Less' : 'Show More' }}
+                                </button>
+                            </div>  
+                          </div>
+                          
+                          <ng-template #noRecords>
+                            <div class="bg-light-yellow text-color col-12 col-md-12 col-lg-12 col-xl-12 mt-4">
+                              <div class="text-start m-4">
+                                <h3><b>No Records</b></h3>
+                              </div>
+                            </div>  
+                          </ng-template>
+                    </div>
+            </div>
+        </div>
+    </div>
+    </div>  
+</div>
+

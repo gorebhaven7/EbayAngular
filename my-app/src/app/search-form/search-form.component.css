@@ -1,0 +1,188 @@
+.back {
+    font-family: sans-serif;
+    font-size: 14px;
+    margin: 0 auto; 
+    height: auto;
+}
+
+@media (min-width: 768px) {
+    .back {
+        width: 80%; 
+        height: auto;
+    }
+}
+
+.tilted-bars {
+    transform: skewX(-30deg);
+}
+.nav-link.custom-active {
+    background-color: #212529; 
+    color: #fff;           
+}
+
+@media (min-width: 768px) {  
+    #category, #distance {
+        width: 50%; 
+        max-width: 140px; 
+    }
+}
+
+@media (max-width: 767px) {
+    label[for="localPickup"] {
+        width: 120px;
+    }
+}
+
+.btn-light:hover {
+    background-color: #fdffff; 
+}
+
+.btn-light:disabled {
+    background-color: #e9ecef;
+    border-color: #e9ecef;
+    color: #6c757d;
+}
+
+.red-asterisk::after {
+    content: '*';
+    color: red;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+  }
+.bg-dark.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05); 
+}
+
+.bg-dark.table-striped tbody tr:nth-of-type(even) {
+    background-color: rgba(0, 0, 0, 0.5); 
+}
+table {
+    width: 100%;
+}
+
+.title-cell {
+    cursor: pointer;
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table td, .table th {
+    vertical-align: top !important; 
+}
+.title-cell, .shipping-cell {
+    font-size: 0.8rem;  
+}
+
+
+.nav-link {
+    background: none;
+    border: none;
+    color: black;
+}
+
+.nav-link.active {
+    background: blue;
+    border: 1px solid blue;
+    color: white;
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+}
+
+.nav.nav-pills {
+    display: inline-flex;
+    margin-left: 10px;
+}
+.pagination-controls button {
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin: 0 3px;
+    transition: background-color 0.3s;
+}
+
+.pagination-controls .page-number {
+    cursor: pointer;
+    padding: 5px 10px;
+    margin: 0 3px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.pagination-controls .page-number.current-page {
+    background-color: blue;
+    color: white;
+}
+
+.highlight {
+    background-color: #f4eded41; 
+  }
+
+.nav-link.active {
+    background-color: #212529;
+    color: #fff;         
+}
+
+.custom-img-small {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.custom-img-medium {
+    height: 300px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.custom-img-large {
+    height: 400px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.mb-2 {
+    margin-bottom: 20px;
+}
+
+@media (max-width: 575.98px) {
+    .carousel-image {
+      max-width: 100%; 
+      height: auto; 
+    }
+  }
+  
+  @media (min-width: 576px) {
+    .carousel-image {
+      max-width: 50%; 
+      height: auto;
+    }
+  }
+  
+  .bg-light-yellow {
+    background-color: #fff3cd; 
+  }
+
+  .text-color{
+        color: #c49300;
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: var(--bs-info); 
+  }
+  
+  .custom-table tbody tr:hover {
+    background-color: rgba(204, 229, 255, 0.251) !important; 
+  }
+
+  .btn-white {
+    background-color: white;
+    /* Other styles to match your design */
+}
